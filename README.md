@@ -8,3 +8,9 @@ ip-range-start,ip-range-end,short-country-code
 ```
 
 the lines need to be sorted ascending by the `ip-range-start` column and the ranges need to be free of gaps.
+
+# TODO
+
+* [ ] ipv6 support
+* [ ] binary search
+* [ ] pre allocate entries vec
