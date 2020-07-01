@@ -58,6 +58,16 @@ async fn routing(req: Request<Body>, db: Arc<AsnDB>) -> Result<Response<Body>> {
     }
 }
 
+fn get_port() -> u16 {
+    if let Ok(env) = std::env::var("PORT") {
+        if let Ok(port) = env.parse::<u16>() {
+            return port;
+        }
+    }
+
+    5000
+}
+
 #[tokio::main]
 pub async fn main() -> Result<()> {
     pretty_env_logger::init();
@@ -71,7 +81,7 @@ pub async fn main() -> Result<()> {
         async { Ok::<_, GenericError>(service_fn(move |req| routing(req, db.clone()))) }
     });
 
-    let addr = ([0, 0, 0, 0], 3000).into();
+    let addr = ([0, 0, 0, 0], get_port()).into();
 
     let server = Server::bind(&addr).serve(service);
 
