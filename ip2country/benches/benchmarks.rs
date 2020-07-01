@@ -12,8 +12,8 @@ fn benchmark_lookup(c: &mut Criterion) {
         b.iter(|| {
             inputs
                 .iter()
-                .map(|ip| db.lookup(black_box(*ip).into()))
-                .flatten()
+                .filter_map(|ip| db.lookup(black_box(*ip).into()))
+                .count()
         })
     });
 }
