@@ -71,7 +71,7 @@ pub async fn main() -> Result<()> {
         async { Ok::<_, GenericError>(service_fn(move |req| routing(req, db.clone()))) }
     });
 
-    let addr = ([127, 0, 0, 1], 3000).into();
+    let addr = ([0, 0, 0, 0], 3000).into();
 
     let server = Server::bind(&addr).serve(service);
 
