@@ -2,7 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use ip2country::AsnDB;
 
 fn benchmark_lookup(c: &mut Criterion) {
-    let db = AsnDB::load("test/full.csv");
+    let db = AsnDB::default().load_ipv4("test/full.csv");
 
     let inputs = [
         3108731904, 16777216, 16908288, 3274341888, 1045158206, 3758096383, 3758096128, 3715741696,
@@ -12,7 +12,7 @@ fn benchmark_lookup(c: &mut Criterion) {
         b.iter(|| {
             inputs
                 .iter()
-                .filter_map(|ip| db.lookup(black_box(*ip).into()))
+                .filter_map(|ip| db.lookup_ipv4(black_box(*ip).into()))
                 .count()
         })
     });
@@ -20,7 +20,7 @@ fn benchmark_lookup(c: &mut Criterion) {
 
 fn benchmark_load(c: &mut Criterion) {
     c.bench_function("load", |b| {
-        b.iter(|| AsnDB::load(black_box("test/full.csv")))
+        b.iter(|| AsnDB::default().load_ipv4(black_box("test/full.csv")))
     });
 }
 

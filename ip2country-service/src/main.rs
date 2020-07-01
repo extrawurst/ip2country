@@ -12,14 +12,14 @@ use hyper::{
     Body, Method, Request, Response, Server, StatusCode,
 };
 use ip2country::AsnDB;
-use std::{net::Ipv4Addr, sync::Arc};
+use std::{net::IpAddr, sync::Arc};
 
 type GenericError = Box<dyn std::error::Error + Send + Sync>;
 type Result<T> = std::result::Result<T, GenericError>;
 
 async fn ip_lookup(uri: String, db: &Arc<AsnDB>) -> Result<Response<Body>> {
     if uri.len() >= 8 {
-        if let Ok(ip) = uri[1..uri.len()].parse::<Ipv4Addr>() {
+        if let Ok(ip) = uri[1..uri.len()].parse::<IpAddr>() {
             if let Some(code) = db.lookup_str(ip) {
                 return Ok(Response::new(code.into()));
             } else {
@@ -72,7 +72,13 @@ fn get_port() -> u16 {
 pub async fn main() -> Result<()> {
     pretty_env_logger::init();
 
-    let db = Arc::new(AsnDB::load("geo-whois-asn-country-ipv4-num.csv"));
+    let db = Arc::new(
+        AsnDB::default()
+            .load_ipv4("geo-whois-asn-country-ipv4-num.csv")
+            .load_ipv6("geo-whois-asn-country-ipv6-num.csv"),
+    );
+    db.lookup(String::from("172.217.21.227").parse().unwrap())
+        .unwrap();
 
     let db_arc = Arc::clone(&db);
 
