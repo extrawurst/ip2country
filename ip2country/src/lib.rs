@@ -3,6 +3,7 @@
 #![deny(clippy::pedantic)]
 #![deny(clippy::nursery)]
 #![deny(clippy::panic)]
+#![allow(clippy::multiple_crate_versions)]
 //TODO:
 // #![deny(clippy::result_unwrap_used)]
 
@@ -16,16 +17,20 @@ use std::{
     str::FromStr,
 };
 
-pub type ShortCountryCode = [u8; 2];
+pub type ShortCountryCode = [ascii::AsciiChar; 2];
 
-// trait BaseType<T>: FromStr + From<u32> + PartialEq + Copy + Add<Output = T> {}
+static GAP: [ascii::AsciiChar; 2] = [ascii::AsciiChar::Null, ascii::AsciiChar::Null];
 
-#[repr(packed(2))]
+#[repr(packed(1))]
 struct Asn<T> {
     start: T,
     code: ShortCountryCode,
 }
 
+const_assert_eq!(std::mem::size_of::<ascii::AsciiChar>(), 1);
+const_assert_eq!(std::mem::size_of::<Option<ascii::AsciiChar>>(), 1);
+const_assert_eq!(std::mem::size_of::<ShortCountryCode>(), 2);
+const_assert_eq!(std::mem::size_of::<Option<ShortCountryCode>>(), 2);
 const_assert_eq!(std::mem::size_of::<Asn<u32>>(), 4 + 2);
 const_assert_eq!(std::mem::size_of::<Asn<u128>>(), 16 + 2);
 
@@ -33,25 +38,53 @@ impl<T> Asn<T>
 where
     T: FromStr + From<u32> + PartialEq + Copy + Add<Output = T> + std::fmt::Debug,
 {
-    fn new(from: String, _last_end: Option<T>) -> Option<(Self, T)> {
+    fn new(from: &str, last_end: Option<T>) -> Option<(Option<Self>, Self, T)> {
         let mut components = from.split(',');
 
         let start = components.next().unwrap().parse::<T>().ok()?;
         let end = components.next().unwrap().parse::<T>().ok()?;
         let code_bytes = components.next().unwrap().as_bytes();
 
-        // if let Some(last_end) = last_end {
-        //     if last_end + T::from(1) != start {
-        //         dbg!("{}+1 != {}", &last_end, &start);
-        //         return None;
-        //     }
-        // }
+        let gap = last_end.and_then(|last_end| {
+            if last_end + T::from(1) == start {
+                None
+            } else {
+                Some(Self {
+                    start: last_end + T::from(1),
+                    code: GAP,
+                })
+            }
+        });
 
         let mut code = [0, 0];
         code.copy_from_slice(code_bytes);
+        let first: ascii::AsciiChar = ascii::AsciiChar::from_ascii(code[0]).unwrap();
+        let second: ascii::AsciiChar = ascii::AsciiChar::from_ascii(code[1]).unwrap();
 
-        Some((Self { code, start }, end))
+        Some((
+            gap,
+            Self {
+                code: [first, second],
+                start,
+            },
+            end,
+        ))
     }
+}
+
+impl<T> Asn<T> {
+    fn get_code(&self) -> Option<ShortCountryCode> {
+        if self.code == GAP {
+            None
+        } else {
+            Some(self.code)
+        }
+    }
+}
+
+fn code_to_str(code: ShortCountryCode) -> Option<String> {
+    let bytes = [code[0].as_byte(), code[1].as_byte()];
+    std::str::from_utf8(bytes.as_ref()).map(String::from).ok()
 }
 
 ///
@@ -86,19 +119,19 @@ impl AsnDB {
     }
 
     ///
-    #[inline]
+    #[must_use]
     pub fn lookup_ipv4(&self, ip: Ipv4Addr) -> Option<ShortCountryCode> {
         Self::lookup_num::<u32>(&self.ip_db_v4, ip.into())
     }
 
     ///
-    #[inline]
+    #[must_use]
     pub fn lookup_ipv6(&self, ip: Ipv6Addr) -> Option<ShortCountryCode> {
         Self::lookup_num::<u128>(&self.ip_db_v6, ip.into())
     }
 
     ///
-    fn lookup_num<T>(entries: &Vec<Asn<T>>, ip: T) -> Option<ShortCountryCode>
+    fn lookup_num<T>(entries: &[Asn<T>], ip: T) -> Option<ShortCountryCode>
     where
         T: PartialOrd + Copy,
     {
@@ -113,42 +146,39 @@ impl AsnDB {
         if ip < first {
             return None;
         } else if ip > last {
-            return Some(entries[len - 1].code);
+            return entries[len - 1].get_code();
         }
 
-        Some(Self::recursive_search_num::<T>(entries, ip, 0, len))
+        Self::recursive_search_num::<T>(entries, ip, 0, len)
     }
 
     fn recursive_search_num<T>(
-        entries: &Vec<Asn<T>>,
+        entries: &[Asn<T>],
         ip: T,
         min: usize,
         max: usize,
-    ) -> ShortCountryCode
+    ) -> Option<ShortCountryCode>
     where
         T: PartialOrd + Copy,
     {
         if max == min + 1 {
-            return entries[min].code;
+            return entries[min].get_code();
         }
 
-        let mid = min + ((max - min) / 2);
-        let mid_value = entries[mid].start;
+        let middle = min + ((max - min) / 2);
+        let mid_value = entries[middle].start;
 
         if ip >= mid_value {
-            return Self::recursive_search_num(entries, ip, mid, max);
+            Self::recursive_search_num(entries, ip, middle, max)
         } else {
-            return Self::recursive_search_num(entries, ip, min, mid);
+            Self::recursive_search_num(entries, ip, min, middle)
         }
     }
 
     ///
     #[must_use]
     pub fn lookup_str(&self, ip: IpAddr) -> Option<String> {
-        self.lookup(ip)
-            .as_ref()
-            .and_then(|r| std::str::from_utf8(r).ok())
-            .map(String::from)
+        self.lookup(ip).and_then(code_to_str).map(String::from)
     }
 
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
@@ -170,11 +200,15 @@ impl AsnDB {
             for line in lines {
                 let line = line.unwrap();
 
-                let entry = Asn::<T>::new(line, last_end).unwrap();
+                let (gap, entry, end) = Asn::<T>::new(&line, last_end).unwrap();
 
-                last_end = Some(entry.1);
+                last_end = Some(end);
 
-                entries.push(entry.0);
+                if let Some(gap) = gap {
+                    entries.push(gap);
+                }
+
+                entries.push(entry);
             }
         }
 
@@ -197,9 +231,7 @@ mod test {
 
     #[test]
     fn test_asn_parse() {
-        let v = Asn::<u32>::new(String::from("1234,1235,AA"), None)
-            .unwrap()
-            .0;
+        let v = Asn::<u32>::new("1234,1235,AA", None).unwrap().1;
 
         let start = v.start;
 
@@ -241,5 +273,14 @@ mod test {
         let db = AsnDB::default().load_ipv4("test/example.csv");
 
         assert_eq!(db.lookup_ipv4(28311551.into()).unwrap(), "TW".as_bytes());
+    }
+
+    #[test]
+    fn test_gaps() {
+        let db = AsnDB::default().load_ipv4("test/gap.csv");
+
+        assert_eq!(db.lookup_ipv4(16777470.into()).unwrap(), "AU".as_bytes());
+        assert_eq!(db.lookup_ipv4(16777471.into()), None);
+        assert_eq!(db.lookup_ipv4(16777472.into()).unwrap(), "CN".as_bytes());
     }
 }
