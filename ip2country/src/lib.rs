@@ -119,4 +119,18 @@ mod test {
         assert_eq!(db.lookup(16843007.into()).unwrap(), "CN".as_bytes());
         assert_eq!(db.lookup(16843008.into()).unwrap(), "AU".as_bytes());
     }
+
+    #[test]
+    fn test_lookup_fail() {
+        let db = AsnDB::load("test/example.csv");
+
+        assert_eq!(db.lookup(16777215.into()).is_none(), true);
+    }
+
+    #[test]
+    fn test_lookup_last() {
+        let db = AsnDB::load("test/example.csv");
+
+        assert_eq!(db.lookup(28311551.into()).unwrap(), "TW".as_bytes());
+    }
 }
