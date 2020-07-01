@@ -12,5 +12,5 @@ the lines need to be sorted ascending by the `ip-range-start` column and the ran
 # TODO
 
 * [ ] ipv6 support
-* [ ] binary search
+* [x] binary search
 * [ ] pre allocate entries vec

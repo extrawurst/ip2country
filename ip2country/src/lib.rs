@@ -68,16 +68,28 @@ impl AsnDB {
     #[must_use]
     pub fn lookup(&self, ip: Ipv4Addr) -> Option<ShortCountryCode> {
         let ip: u32 = ip.into();
-        let mut last_code = None;
 
-        for entry in &self.entries {
-            if entry.start > ip {
-                break;
-            }
-            last_code = Some(entry.code);
+        if ip < self.entries[0].start {
+            return None;
+        } else if ip > self.entries[self.entries.len() - 1].start {
+            return Some(self.entries[self.entries.len() - 1].code);
         }
 
-        last_code
+        Some(self.lookup_num(ip, 0, self.entries.len()))
+    }
+
+    fn lookup_num(&self, ip: u32, min: usize, max: usize) -> ShortCountryCode {
+        if max == min + 1 {
+            return self.entries[min].code;
+        }
+
+        let mid = min + ((max - min) / 2);
+
+        if ip >= self.entries[mid].start {
+            return self.lookup_num(ip, mid, max);
+        } else {
+            return self.lookup_num(ip, min, mid);
+        }
     }
 
     ///
