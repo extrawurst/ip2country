@@ -7,6 +7,7 @@
 //TODO:
 // #![deny(clippy::result_unwrap_used)]
 
+use ascii::AsciiChar;
 use static_assertions::const_assert_eq;
 use std::{
     fs::File,
@@ -17,18 +18,16 @@ use std::{
     str::FromStr,
 };
 
-pub type ShortCountryCode = [ascii::AsciiChar; 2];
-
-static GAP: [ascii::AsciiChar; 2] = [ascii::AsciiChar::Null, ascii::AsciiChar::Null];
+pub type ShortCountryCode = [AsciiChar; 2];
 
 #[repr(packed(1))]
 struct Asn<T> {
     start: T,
-    code: ShortCountryCode,
+    code: Option<ShortCountryCode>,
 }
 
-const_assert_eq!(std::mem::size_of::<ascii::AsciiChar>(), 1);
-const_assert_eq!(std::mem::size_of::<Option<ascii::AsciiChar>>(), 1);
+const_assert_eq!(std::mem::size_of::<AsciiChar>(), 1);
+const_assert_eq!(std::mem::size_of::<Option<AsciiChar>>(), 1);
 const_assert_eq!(std::mem::size_of::<ShortCountryCode>(), 2);
 const_assert_eq!(std::mem::size_of::<Option<ShortCountryCode>>(), 2);
 const_assert_eq!(std::mem::size_of::<Asn<u32>>(), 4 + 2);
@@ -51,34 +50,24 @@ where
             } else {
                 Some(Self {
                     start: last_end + T::from(1),
-                    code: GAP,
+                    code: None,
                 })
             }
         });
 
-        let mut code = [0, 0];
-        code.copy_from_slice(code_bytes);
-        let first: ascii::AsciiChar = ascii::AsciiChar::from_ascii(code[0]).unwrap();
-        let second: ascii::AsciiChar = ascii::AsciiChar::from_ascii(code[1]).unwrap();
+        let mut code: [AsciiChar; 2] = [AsciiChar::Null, AsciiChar::Null];
+        for (i, code) in code.iter_mut().enumerate() {
+            *code = AsciiChar::from_ascii(code_bytes[i]).unwrap();
+        }
 
         Some((
             gap,
             Self {
-                code: [first, second],
+                code: Some(code),
                 start,
             },
             end,
         ))
-    }
-}
-
-impl<T> Asn<T> {
-    fn get_code(&self) -> Option<ShortCountryCode> {
-        if self.code == GAP {
-            None
-        } else {
-            Some(self.code)
-        }
     }
 }
 
@@ -146,7 +135,7 @@ impl AsnDB {
         if ip < first {
             return None;
         } else if ip > last {
-            return entries[len - 1].get_code();
+            return entries[len - 1].code;
         }
 
         Self::recursive_search_num::<T>(entries, ip, 0, len)
@@ -162,7 +151,7 @@ impl AsnDB {
         T: PartialOrd + Copy,
     {
         if max == min + 1 {
-            return entries[min].get_code();
+            return entries[min].code;
         }
 
         let middle = min + ((max - min) / 2);
