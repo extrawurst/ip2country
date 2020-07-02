@@ -2,4 +2,5 @@
 
 ## todo
 
+* [ ] write readme :D
 * [ ] auto download fresh db
