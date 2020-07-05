@@ -13,5 +13,6 @@ LABEL maintainer="extrawurst"
 RUN apt-get update && apt-get install -y openssl
 WORKDIR ipsrv
 ADD ip2country-service/geo-whois-asn-country-ipv4-num.csv ./
+ADD ip2country-service/geo-whois-asn-country-ipv6-num.csv ./
 COPY --from=builder /ipsrv/target/ip2country ./
 CMD ["./ip2country"]
