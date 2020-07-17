@@ -75,8 +75,11 @@ pub async fn main() -> Result<()> {
             .load_ipv4("geo-whois-asn-country-ipv4-num.csv")
             .load_ipv6("geo-whois-asn-country-ipv6-num.csv"),
     );
-    db.lookup(String::from("172.217.21.227").parse().unwrap())
-        .unwrap();
+
+    println!(
+        "google.com: {:?}",
+        db.lookup(String::from("172.217.16.78").parse().unwrap())
+    );
 
     let db_arc = Arc::clone(&db);
 
