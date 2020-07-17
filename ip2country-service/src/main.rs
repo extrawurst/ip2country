@@ -4,8 +4,6 @@
 #![deny(clippy::nursery)]
 #![deny(clippy::panic)]
 #![allow(clippy::multiple_crate_versions)]
-//TODO: remove in 1.45
-#![allow(clippy::used_underscore_binding)]
 
 use hyper::{
     service::{make_service_fn, service_fn},
