@@ -12,3 +12,6 @@ docker-build:
 
 docker-run:
 	docker run -it -p 3000:3000 ipsrv
+
+check:
+	cargo clean -p ip2country-service -p ip2country && cargo clippy

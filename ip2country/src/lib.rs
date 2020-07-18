@@ -7,12 +7,16 @@
 //TODO:
 // #![deny(clippy::result_unwrap_used)]
 
+mod error;
+
 use ascii::AsciiChar;
+use error::Result;
 use static_assertions::const_assert_eq;
 use std::{
     fs::File,
     io::{self, BufRead},
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
+    num::ParseIntError,
     ops::Add,
     path::Path,
     str::FromStr,
@@ -37,11 +41,14 @@ impl<T> Asn<T>
 where
     T: FromStr + From<u32> + PartialEq + Copy + Add<Output = T> + std::fmt::Debug,
 {
-    fn new(from: &str, last_end: Option<T>) -> Option<(Option<Self>, Self, T)> {
+    fn new(
+        from: &str,
+        last_end: Option<T>,
+    ) -> std::result::Result<(Option<Self>, Self, T), T::Err> {
         let mut components = from.split(',');
 
-        let start = components.next().unwrap().parse::<T>().ok()?;
-        let end = components.next().unwrap().parse::<T>().ok()?;
+        let start = components.next().unwrap().parse::<T>()?;
+        let end = components.next().unwrap().parse::<T>()?;
         let code_bytes = components.next().unwrap().as_bytes();
 
         let gap = last_end.and_then(|last_end| {
@@ -60,7 +67,7 @@ where
             *code = AsciiChar::from_ascii(code_bytes[i]).unwrap();
         }
 
-        Some((
+        Ok((
             gap,
             Self {
                 code: Some(code),
@@ -84,18 +91,26 @@ pub struct AsnDB {
 }
 
 impl AsnDB {
+    /// loads csv file of format: ip-range-start (v4),ip-range-end,short-country-code
     ///
-    #[must_use]
-    pub fn load_ipv4(mut self, file: &str) -> Self {
-        self.ip_db_v4 = Self::load_file(file);
-        self
+    /// # Errors
+    ///
+    /// Will return `Err` if `file` does not exist or the user does not have
+    /// permission to read it, or when the content was not in the correct format
+    pub fn load_ipv4(mut self, file: &str) -> Result<Self> {
+        self.ip_db_v4 = Self::load_file(file)?;
+        Ok(self)
     }
 
+    /// loads csv file of format: ip-range-start (v6),ip-range-end,short-country-code
     ///
-    #[must_use]
-    pub fn load_ipv6(mut self, file: &str) -> Self {
-        self.ip_db_v6 = Self::load_file(file);
-        self
+    /// # Errors
+    ///
+    /// Will return `Err` if `file` does not exist or the user does not have
+    /// permission to read it, or when the content was not in the correct format
+    pub fn load_ipv6(mut self, file: &str) -> Result<Self> {
+        self.ip_db_v6 = Self::load_file(file)?;
+        Ok(self)
     }
 
     ///
@@ -178,32 +193,37 @@ impl AsnDB {
         Ok(io::BufReader::new(file).lines())
     }
 
-    fn load_file<T>(file: &str) -> Vec<Asn<T>>
+    fn load_file<T>(file: &str) -> Result<Vec<Asn<T>>>
     where
-        T: FromStr + From<u32> + PartialEq + Copy + Add<Output = T> + std::fmt::Debug,
+        T: FromStr<Err = ParseIntError>
+            + From<u32>
+            + PartialEq
+            + Copy
+            + Add<Output = T>
+            + std::fmt::Debug,
     {
         let mut entries = Vec::new();
 
-        if let Ok(lines) = Self::read_lines(file) {
-            let mut last_end = None;
-            for line in lines {
-                let line = line.unwrap();
+        let lines = Self::read_lines(file)?;
 
-                let (gap, entry, end) = Asn::<T>::new(&line, last_end).unwrap();
+        let mut last_end = None;
+        for line in lines {
+            let line = line?;
 
-                last_end = Some(end);
+            let (gap, entry, end) = Asn::<T>::new(&line, last_end)?;
 
-                if let Some(gap) = gap {
-                    entries.push(gap);
-                }
+            last_end = Some(end);
 
-                entries.push(entry);
+            if let Some(gap) = gap {
+                entries.push(gap);
             }
+
+            entries.push(entry);
         }
 
         entries.shrink_to_fit();
 
-        entries
+        Ok(entries)
     }
 }
 
@@ -229,21 +249,21 @@ mod test {
 
     #[test]
     fn test_load_db() {
-        let db = AsnDB::default().load_ipv4("test/example.csv");
+        let db = AsnDB::default().load_ipv4("test/example.csv").unwrap();
 
         assert_eq!(db.ip_db_v4.len(), 78);
     }
 
     #[test]
     fn test_load_ipv4() {
-        let db = AsnDB::load_file::<u32>("test/example.csv");
+        let db = AsnDB::load_file::<u32>("test/example.csv").unwrap();
 
         assert_eq!(db.len(), 78);
     }
 
     #[test]
     fn test_lookup() {
-        let db = AsnDB::default().load_ipv4("test/example.csv");
+        let db = AsnDB::default().load_ipv4("test/example.csv").unwrap();
 
         assert_eq!(db.lookup_ipv4(16842752.into()).unwrap(), "CN".as_bytes());
         assert_eq!(db.lookup_ipv4(16843007.into()).unwrap(), "CN".as_bytes());
@@ -252,21 +272,21 @@ mod test {
 
     #[test]
     fn test_lookup_fail() {
-        let db = AsnDB::default().load_ipv4("test/example.csv");
+        let db = AsnDB::default().load_ipv4("test/example.csv").unwrap();
 
         assert_eq!(db.lookup_ipv4(16777215.into()).is_none(), true);
     }
 
     #[test]
     fn test_lookup_last() {
-        let db = AsnDB::default().load_ipv4("test/example.csv");
+        let db = AsnDB::default().load_ipv4("test/example.csv").unwrap();
 
         assert_eq!(db.lookup_ipv4(28311551.into()).unwrap(), "TW".as_bytes());
     }
 
     #[test]
     fn test_gaps() {
-        let db = AsnDB::default().load_ipv4("test/gap.csv");
+        let db = AsnDB::default().load_ipv4("test/gap.csv").unwrap();
 
         assert_eq!(db.lookup_ipv4(16777470.into()).unwrap(), "AU".as_bytes());
         assert_eq!(db.lookup_ipv4(16777471.into()), None);

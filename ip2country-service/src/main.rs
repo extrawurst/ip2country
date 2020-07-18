@@ -72,8 +72,8 @@ pub async fn main() -> Result<()> {
 
     let db = Arc::new(
         AsnDB::default()
-            .load_ipv4("geo-whois-asn-country-ipv4-num.csv")
-            .load_ipv6("geo-whois-asn-country-ipv6-num.csv"),
+            .load_ipv4("geo-whois-asn-country-ipv4-num.csv")?
+            .load_ipv6("geo-whois-asn-country-ipv6-num.csv")?,
     );
 
     println!(
