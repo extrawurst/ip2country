@@ -4,7 +4,6 @@ find it on [docker hub](https://hub.docker.com/repository/docker/extrawurst/ip2c
 
 ## todo
 
-* [ ] error handling
 * [ ] write readme :D
 * [ ] download db during docker build 
 * [ ] nightly updates via CI
