@@ -16,7 +16,7 @@ keywords = [
 ]
 
 [dependencies]
-ip2country = { path = "../ip2country", version = "0.1.0" }
+ip2country = { path = "../ip2country", version = "0.2.0" }
 hyper = { version = "0.13", default-features = false, features = ["runtime"] }
 tokio = { version = "0.2", default-features = false, features = ["macros"] }
 pretty_env_logger = "0.4"
