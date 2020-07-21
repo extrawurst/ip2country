@@ -1,6 +1,6 @@
 [package]
 name = "ip2country"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2018"
 authors = ["Stephan Dilly <dilly.stephan@gmail.com>"]
 description = "fast ip to asn-country lookup"
