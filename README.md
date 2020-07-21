@@ -5,6 +5,7 @@ find it on [docker hub](https://hub.docker.com/repository/docker/extrawurst/ip2c
 # features
 
 * lightweight and fast
+* supports **ipv4** and **ipv6**
 * free and no license mess (CC0)
 * nightly updated with fresh APNs tables
 
@@ -12,7 +13,9 @@ find it on [docker hub](https://hub.docker.com/repository/docker/extrawurst/ip2c
 
 ```
 docker run -d --rm --name ip2country -p 5000:5000 extrawurst/ip2country:latest
-curl http://0.0.0.0:5000/1.2.3.4
-AU
+curl http://0.0.0.0:5000/2a00:1450:4005:800::200e
+US
+curl http://0.0.0.0:5000/172.217.16.78
+US
 docker kill ip2country
 ```
