@@ -24,3 +24,8 @@ US
 
 docker kill ip2country
 ```
+
+use `PORT` env variable to change the default port (5000):
+```
+docker run -p 9000:9000 -e PORT=9000 extrawurst/ip2country
+```
