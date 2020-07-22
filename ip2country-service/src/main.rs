@@ -18,6 +18,7 @@ type Result<T> = std::result::Result<T, GenericError>;
 async fn ip_lookup(uri: String, db: &Arc<AsnDB>) -> Result<Response<Body>> {
     if uri.len() >= 8 {
         if let Ok(ip) = uri[1..uri.len()].parse::<IpAddr>() {
+            log::info!("lookup: {}", ip);
             if let Some(code) = db.lookup_str(ip) {
                 return Ok(Response::new(code.into()));
             } else {
