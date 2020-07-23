@@ -1,6 +1,9 @@
 KUBE_CONF=.k8/config.yaml
 K8_CONF=k8.yaml
 
+tf-init:
+	@terraform init
+
 tf-plan:
 	@terraform plan
 
