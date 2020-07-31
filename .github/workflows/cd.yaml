@@ -16,6 +16,9 @@ jobs:
         docker login \
         -u ${{ secrets.DOCKER_USERNAME }} \
         -p ${{ secrets.DOCKER_PASSWORD }}
+      
+    - name: Download CSVs
+      run: make download
 
     - name: Build Docker image
       run: docker build -t extrawurst/ip2country:latest -f Dockerfile .
