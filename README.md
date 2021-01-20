@@ -1,5 +1,7 @@
 # ip2country
 
+![Publish Docker](https://github.com/extrawurst/ip2country/workflows/Publish%20Docker/badge.svg)
+
 uses free (CC0) APNs lookup [tables](https://github.com/sapics/ip-location-db) for ip to country lookup based on [OpenGeoFeed.com](https://opengeofeed.org).
 
 find the docker image on [docker hub](https://hub.docker.com/repository/docker/extrawurst/ip2country).
