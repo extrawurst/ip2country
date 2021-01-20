@@ -11,7 +11,7 @@ docker-local:
 	docker build -t extrawurst/ip2country:latest -f Dockerfile.local .
 
 docker-run:
-	docker run -it -p 3000:3000 ipsrv
+	docker run -it -p 5000:5000 extrawurst/ip2country:latest
 
 check:
 	cargo clean -p ip2country-service -p ip2country && cargo clippy
