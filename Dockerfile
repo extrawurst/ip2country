@@ -6,6 +6,7 @@ ADD ip2country-service ./ip2country-service
 ADD Cargo.toml ./Cargo.toml
 ADD Cargo.lock ./Cargo.lock
 RUN cargo build --release
+RUN ls -lh target/release/ip2country-service
 RUN cp ./target/release/ip2country-service ./target/ip2country
 
 FROM ubuntu
