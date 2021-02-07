@@ -3,6 +3,16 @@ name = "ip2country-bench"
 version = "0.1.0"
 authors = ["Stephan Dilly <dilly.stephan@gmail.com>"]
 edition = "2018"
+description = "iai benchmarking"
+repository = "https://github.com/extrawurst/ip2country"
+readme = "README.md"
+license = "MIT"
+categories = ["web-programming"]
+keywords = [
+    "web",
+    "ip-lookup",
+    "server",
+]
 
 [dependencies]
 ip2country = { path = "../ip2country" }
