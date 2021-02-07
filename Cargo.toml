@@ -2,6 +2,7 @@
 members=[
     "ip2country",
     "ip2country-service",
+    "ip2country-bench"
 ]
 
 [profile.release]

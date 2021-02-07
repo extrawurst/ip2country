@@ -349,6 +349,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "iai"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71a816c97c42258aa5834d07590b718b4c9a598944cd39a52dc25b351185d678"
+
+[[package]]
 name = "ip2country"
 version = "0.2.0"
 dependencies = [
@@ -356,6 +362,14 @@ dependencies = [
  "criterion",
  "static_assertions",
  "thiserror",
+]
+
+[[package]]
+name = "ip2country-bench"
+version = "0.1.0"
+dependencies = [
+ "iai",
+ "ip2country",
 ]
 
 [[package]]
