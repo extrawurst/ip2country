@@ -21,10 +21,9 @@ async fn ip_lookup(uri: String, db: &Arc<AsnDB>) -> Result<Response<Body>> {
             log::info!("lookup: {}", ip);
             if let Some(code) = db.lookup_str(ip) {
                 return Ok(Response::new(code.into()));
-            } else {
-                log::warn!("ip lookup failed: {}", ip);
-                return Ok(Response::new("".into()));
             }
+            log::warn!("ip lookup failed: {}", ip);
+            return Ok(Response::new("".into()));
         }
     }
 
