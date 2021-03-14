@@ -11,3 +11,9 @@ jobs:
     
     - name: check
       run: make check
+
+    - name: benchmark-iai
+      run: cd ip2country-bench && make bench-inside-docker
+    
+    - name: benchmark
+      run: cargo bench

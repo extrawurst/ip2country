@@ -18,7 +18,7 @@ keywords = [
 ip2country = { path = "../ip2country" }
 
 [dev-dependencies]
-iai = "0.1"
+iai = { git = "https://github.com/bheisler/iai.git", rev = "58e28e940c62898a45d17cb531f9012fb173d236" }
 
 [[bench]]
 name = "benchmark"
