@@ -1,8 +1,8 @@
 [package]
 name = "ip2country-bench"
 version = "0.1.0"
-authors = ["Stephan Dilly <dilly.stephan@gmail.com>"]
-edition = "2018"
+authors = ["extrawurst <mail@rusticorn.com>"]
+edition = "2021"
 description = "iai benchmarking"
 repository = "https://github.com/extrawurst/ip2country"
 readme = "README.md"

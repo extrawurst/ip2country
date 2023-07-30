@@ -11,23 +11,27 @@ use hyper::{
 };
 use ip2country::AsnDB;
 use std::{net::IpAddr, sync::Arc};
+use tokio::task::spawn_blocking;
 
 type GenericError = Box<dyn std::error::Error + Send + Sync>;
 type Result<T> = std::result::Result<T, GenericError>;
 
-async fn ip_lookup(uri: String, db: &Arc<AsnDB>) -> Result<Response<Body>> {
-    if uri.len() >= 8 {
-        if let Ok(ip) = uri[1..uri.len()].parse::<IpAddr>() {
-            log::info!("lookup: {}", ip);
-            if let Some(code) = db.lookup_str(ip) {
-                return Ok(Response::new(code.into()));
+async fn ip_lookup(uri: String, db: Arc<AsnDB>) -> Result<Response<Body>> {
+    Ok(spawn_blocking(move || {
+        if uri.len() >= 8 {
+            if let Ok(ip) = uri[1..uri.len()].parse::<IpAddr>() {
+                log::info!("lookup: {}", ip);
+                if let Some(code) = db.lookup_str(ip) {
+                    return Response::new(code.into());
+                }
+                log::warn!("ip lookup failed: {}", ip);
+                return Response::new("".into());
             }
-            log::warn!("ip lookup failed: {}", ip);
-            return Ok(Response::new("".into()));
         }
-    }
 
-    Ok(bad_request())
+        bad_request()
+    })
+    .await?)
 }
 
 fn not_found() -> Response<Body> {
@@ -47,10 +51,7 @@ fn bad_request() -> Response<Body> {
 async fn routing(req: Request<Body>, db: Arc<AsnDB>) -> Result<Response<Body>> {
     match (req.method(), req.uri().path()) {
         // (&Method::GET, "/myip") => Ok(Response::new(INDEX.into())),
-        (&Method::GET, uri) => {
-            let uri = String::from(uri);
-            ip_lookup(uri, &db).await
-        }
+        (&Method::GET, uri) => ip_lookup(uri.to_string(), db.clone()).await,
 
         _ => Ok(not_found()),
     }
@@ -92,7 +93,7 @@ pub async fn main() -> Result<()> {
 
     let server = Server::bind(&addr).serve(service);
 
-    println!("Listening on http://{}", addr);
+    println!("Listening on http://{addr}");
 
     server.await?;
 
