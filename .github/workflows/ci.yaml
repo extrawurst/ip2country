@@ -3,7 +3,7 @@ on:
   push:
     branches: [ '*' ]
 jobs:
-  build:
+  build_and_benchmark:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
