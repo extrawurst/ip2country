@@ -8,11 +8,11 @@ repository = "https://github.com/extrawurst/ip2country"
 readme = "README.md"
 license = "MIT"
 categories = ["web-programming"]
-keywords = [
-    "web",
-    "ip-lookup",
-    "server",
-]
+keywords = ["web", "ip-lookup", "server"]
+rust-version = "1.74"
+
+[lints]
+workspace = true
 
 [dependencies]
 ip2country = { path = "../ip2country" }

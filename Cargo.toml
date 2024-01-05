@@ -1,11 +1,16 @@
 [workspace]
-members=[
-    "ip2country",
-    "ip2country-service",
-    "ip2country-bench"
-]
+members = ["ip2country", "ip2country-service", "ip2country-bench"]
 resolver = "2"
 
 [profile.release]
 lto = true
 codegen-units = 1
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+cargo = "deny"
+pedantic = "deny"
+nursery = "deny"
+panic = "deny"

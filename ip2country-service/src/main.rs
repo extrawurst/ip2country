@@ -1,10 +1,3 @@
-#![forbid(unsafe_code)]
-#![deny(clippy::cargo)]
-#![deny(clippy::pedantic)]
-#![deny(clippy::nursery)]
-#![deny(clippy::panic)]
-#![allow(clippy::multiple_crate_versions)]
-
 use http_body_util::Full;
 use hyper::{
     body::{Bytes, Incoming as IncomingBody},

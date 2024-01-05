@@ -8,12 +8,12 @@ homepage = "https://github.com/extrawurst/ip2country"
 repository = "https://github.com/extrawurst/ip2country"
 readme = "README.md"
 license = "MIT"
-categories = ["data-structures","parser-implementations","web-programming"]
-keywords = [
-    "web",
-    "ip-lookup",
-    "server",
-]
+categories = ["data-structures", "parser-implementations", "web-programming"]
+keywords = ["web", "ip-lookup", "server"]
+rust-version = "1.74"
+
+[lints]
+workspace = true
 
 [dependencies]
 static_assertions = "1.1"

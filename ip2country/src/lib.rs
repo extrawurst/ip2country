@@ -1,9 +1,3 @@
-#![forbid(unsafe_code)]
-#![deny(clippy::cargo)]
-#![deny(clippy::pedantic)]
-#![deny(clippy::nursery)]
-#![deny(clippy::panic)]
-#![allow(clippy::multiple_crate_versions)]
 //TODO:
 // #![deny(clippy::result_unwrap_used)]
 

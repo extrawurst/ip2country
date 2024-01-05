@@ -10,6 +10,10 @@ readme = "README.md"
 license = "MIT"
 categories = ["web-programming"]
 keywords = ["web", "ip-lookup", "server"]
+rust-version = "1.74"
+
+[lints]
+workspace = true
 
 [dependencies]
 ip2country = { path = "../ip2country", version = "0.3" }
