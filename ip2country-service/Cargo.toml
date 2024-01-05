@@ -9,15 +9,13 @@ repository = "https://github.com/extrawurst/ip2country"
 readme = "README.md"
 license = "MIT"
 categories = ["web-programming"]
-keywords = [
-    "web",
-    "ip-lookup",
-    "server",
-]
+keywords = ["web", "ip-lookup", "server"]
 
 [dependencies]
 ip2country = { path = "../ip2country", version = "0.3" }
-hyper = { version = "0.14", features = ["server","runtime","http1"] }
-tokio = { version = "1", features = ["rt-multi-thread","net","macros"] }
+hyper = { version = "1", features = ["server", "http1"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "macros"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+http-body-util = "0.1"
 pretty_env_logger = "0.5"
 log = "0.4"

@@ -13,5 +13,9 @@ docker-local:
 docker-run:
 	docker run -it -p 5000:5000 extrawurst/ip2country:latest
 
+test:
+	# run this once the container runs locally (see above)
+	xh 0.0.0.0:5000/172.217.16.78
+
 check:
 	cargo clean -p ip2country-service -p ip2country && cargo clippy
