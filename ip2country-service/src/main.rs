@@ -1,3 +1,5 @@
+#![allow(clippy::multiple_crate_versions)]
+
 use http_body_util::Full;
 use hyper::{
     body::{Bytes, Incoming as IncomingBody},

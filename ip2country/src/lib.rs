@@ -72,12 +72,13 @@ where
     }
 }
 
+// converts byte array country code to string version of it
 fn code_to_str(code: ShortCountryCode) -> Option<String> {
     let bytes = [code[0].as_byte(), code[1].as_byte()];
     std::str::from_utf8(bytes.as_ref()).map(String::from).ok()
 }
 
-///
+/// stores thow lookup DBs, one for ipv4 and one for ipv6
 #[derive(Default)]
 pub struct AsnDB {
     ip_db_v4: Vec<Asn<u32>>,
@@ -107,7 +108,7 @@ impl AsnDB {
         Ok(self)
     }
 
-    ///
+    /// lookup ip to country and returning in the format of a `ShortCountryCode`
     #[must_use]
     pub fn lookup(&self, ip: IpAddr) -> Option<ShortCountryCode> {
         match ip {
@@ -116,19 +117,18 @@ impl AsnDB {
         }
     }
 
-    ///
+    /// lookup a ipv4 address
     #[must_use]
     pub fn lookup_ipv4(&self, ip: Ipv4Addr) -> Option<ShortCountryCode> {
         Self::lookup_num::<u32>(&self.ip_db_v4, ip.into())
     }
 
-    ///
+    /// lookup a ipv6 address
     #[must_use]
     pub fn lookup_ipv6(&self, ip: Ipv6Addr) -> Option<ShortCountryCode> {
         Self::lookup_num::<u128>(&self.ip_db_v6, ip.into())
     }
 
-    ///
     fn lookup_num<T>(entries: &[Asn<T>], ip: T) -> Option<ShortCountryCode>
     where
         T: PartialOrd + Copy,
@@ -173,10 +173,10 @@ impl AsnDB {
         }
     }
 
-    ///
+    /// does the lookup and converts the result to a `String`
     #[must_use]
     pub fn lookup_str(&self, ip: IpAddr) -> Option<String> {
-        self.lookup(ip).and_then(code_to_str).map(String::from)
+        self.lookup(ip).and_then(code_to_str)
     }
 
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
