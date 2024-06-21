@@ -6,6 +6,8 @@ IP6_FILE=geo-whois-asn-country-ipv6-num.csv
 download:
 	curl "${BASE_URL}/${IP4_FILE}" > ip2country-service/${IP4_FILE}
 	curl "${BASE_URL}/${IP6_FILE}" > ip2country-service/${IP6_FILE}
+	cp ip2country-service/${IP4_FILE} ip2country-grpc/${IP4_FILE}
+	cp ip2country-service/${IP6_FILE} ip2country-grpc/${IP6_FILE}
 
 docker-local:
 	docker build -t extrawurst/ip2country:latest -f Dockerfile.local .
@@ -18,4 +20,4 @@ test:
 	xh 0.0.0.0:5000/172.217.16.78
 
 check:
-	cargo clean -p ip2country-service -p ip2country && cargo clippy
+	cargo clippy --workspace

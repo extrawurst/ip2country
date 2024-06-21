@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ip2c;
+
+service IPLookup {
+    rpc Send (LookupRequest) returns (LookupResponse);
+}
+
+message LookupRequest {
+    string ip = 1;
+}
+
+message LookupResponse {
+    // two letter country code
+    optional string country = 1;
+}

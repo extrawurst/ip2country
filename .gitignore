@@ -2,3 +2,5 @@
 .DS_Store
 ip2country-service/geo-whois-asn-country-ipv4-num.csv
 ip2country-service/geo-whois-asn-country-ipv6-num.csv
+ip2country-grpc/geo-whois-asn-country-ipv4-num.csv
+ip2country-grpc/geo-whois-asn-country-ipv6-num.csv
