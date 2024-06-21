@@ -25,3 +25,9 @@ jobs:
 
     - name: Publish Docker image
       run: docker push extrawurst/ip2country
+
+    - name: Build Docker image (grpc)
+      run: docker build -t extrawurst/ip2country-grpc:latest -f Dockerfile.grpc .
+
+    - name: Publish Docker image
+      run: docker push extrawurst/ip2country-grpc
