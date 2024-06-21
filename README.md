@@ -12,9 +12,11 @@ find the docker image on [docker hub](https://hub.docker.com/repository/docker/e
 * supports **ipv4** and **ipv6**
 * free APNs tables, no license mess
 * nightly updated with fresh APNs tables
+* use via REST or gRPC
 
-# example
+# REST example
 
+use REST service:
 ```
 docker run -d --rm --name ip2country -p 5000:5000 extrawurst/ip2country:latest
 
@@ -30,4 +32,20 @@ docker kill ip2country
 use `PORT` env variable to change the default port (5000):
 ```
 docker run -p 9000:9000 -e PORT=9000 extrawurst/ip2country
+```
+
+# gRPC example
+
+use gRPC service:
+```
+docker run -d --rm --name ip2country -p 50051:50051 extrawurst/ip2country-grpc:latest
+
+<connect via your grpc client of choice>
+
+docker kill ip2country
+```
+
+use `SRV_ADDR` env variable to change the services address:
+```
+docker run -p 9000:9000 -e SRV_ADDR=0.0.0.0:9000 extrawurst/ip2country
 ```
