@@ -42,6 +42,10 @@ impl IpLookup for LookupServer {
     }
 }
 
+fn get_service_addr() -> String {
+    std::env::var("SRV_ADDR").unwrap_or_else(|_| "[::1]:50051".into())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db = Arc::new(
@@ -51,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // defining address for our service
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = get_service_addr().parse().unwrap();
 
     // creating a service
     let server = LookupServer { db };
