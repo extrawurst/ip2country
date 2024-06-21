@@ -3,10 +3,11 @@ LABEL maintainer="extrawurst"
 WORKDIR /ipsrv
 ADD ip2country ./ip2country
 ADD ip2country-service ./ip2country-service
+ADD ip2country-grpc ./ip2country-grpc
 ADD ip2country-bench ./ip2country-bench
 ADD Cargo.toml ./Cargo.toml
 ADD Cargo.lock ./Cargo.lock
-RUN cargo build --release
+RUN cargo build -p ip2country-service --release
 RUN ls -lh target/release/ip2country-service
 RUN cp ./target/release/ip2country-service ./target/ip2country
 
