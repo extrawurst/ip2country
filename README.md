@@ -36,6 +36,9 @@ docker run -p 9000:9000 -e PORT=9000 extrawurst/ip2country
 
 # gRPC example
 
+Find grpc proto definition here: 
+[ip2country-grpc/proto/ip2c.proto](./ip2country-grpc/proto/ip2c.proto)
+
 use gRPC service:
 ```
 docker run -d --rm --name ip2country -p 50051:50051 extrawurst/ip2country-grpc:latest
