@@ -12,6 +12,9 @@ download:
 docker-local:
 	docker build -t extrawurst/ip2country:latest -f Dockerfile.local .
 
+docker-local-grpc:
+	docker build -t extrawurst/ip2country-grpc:latest -f Dockerfile.grpc.local .
+
 docker-run:
 	docker run -it -p 5000:5000 extrawurst/ip2country:latest
 
