@@ -19,6 +19,9 @@ pub mod ip2c {
         clippy::missing_errors_doc
     )]
     tonic::include_proto!("ip2c");
+
+    pub(crate) const FILE_DESCRIPTOR_SET: &[u8] =
+        tonic::include_file_descriptor_set!("ip2c_descriptor");
 }
 
 pub struct LookupServer {
@@ -37,6 +40,10 @@ impl IpLookup for LookupServer {
             .parse::<IpAddr>()
             .ok()
             .and_then(|ip| self.db.lookup_str(ip));
+
+        //TODO: use tracing
+        // tracing::info!("lookup: {} -> {country:?}", request.get_ref().ip,);
+        println!("lookup: {} -> {country:?}", request.get_ref().ip,);
 
         Ok(Response::new(LookupResponse { country }))
     }
@@ -57,12 +64,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
     let addr = get_service_addr().parse().unwrap();
 
+    let reflection_service = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(ip2c::FILE_DESCRIPTOR_SET)
+        .build()
+        .unwrap();
+
     // creating a service
     let server = LookupServer { db };
     println!("Server listening on {addr}");
 
     // adding our service to our server.
     Server::builder()
+        .add_service(reflection_service)
         .add_service(IpLookupServer::new(server))
         .serve(addr)
         .await?;

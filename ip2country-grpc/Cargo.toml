@@ -18,6 +18,8 @@ name = "simple"
 prost = "0.12"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tonic = "0.11"
+tonic-reflection = "0.11"
+tracing = "0.1"
 ip2country = { path = "../ip2country", version = "0.3" }
 
 [build-dependencies]
