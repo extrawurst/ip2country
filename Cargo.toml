@@ -18,4 +18,5 @@ unsafe_code = "forbid"
 cargo = "deny"
 pedantic = "deny"
 nursery = "deny"
-panic = "deny"
+# see https://github.com/rust-lang/rust-clippy/issues/12729
+# panic = "deny"
