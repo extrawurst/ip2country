@@ -12,7 +12,6 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
     num::ParseIntError,
     ops::Add,
-    path::Path,
     str::FromStr,
 };
 
@@ -93,7 +92,14 @@ impl AsnDB {
     /// Will return `Err` if `file` does not exist or the user does not have
     /// permission to read it, or when the content was not in the correct format
     pub fn load_ipv4(mut self, file: &str) -> Result<Self> {
-        self.ip_db_v4 = Self::load_file(file)?;
+        self.ip_db_v4 = Self::from_reader(File::open(file)?)?;
+        Ok(self)
+    }
+
+    /// loads csv file of format: ip-range-start (v4),ip-range-end,short-country-code
+    /// from a reader
+    pub fn load_ipv4_from_reader<R: std::io::Read>(mut self, reader: R) -> Result<Self> {
+        self.ip_db_v4 = Self::from_reader(reader)?;
         Ok(self)
     }
 
@@ -104,7 +110,14 @@ impl AsnDB {
     /// Will return `Err` if `file` does not exist or the user does not have
     /// permission to read it, or when the content was not in the correct format
     pub fn load_ipv6(mut self, file: &str) -> Result<Self> {
-        self.ip_db_v6 = Self::load_file(file)?;
+        self.ip_db_v6 = Self::from_reader(File::open(file)?)?;
+        Ok(self)
+    }
+
+    /// loads csv file of format: ip-range-start (v4),ip-range-end,short-country-code
+    /// from a reader
+    pub fn load_ipv6_from_reader<R: std::io::Read>(mut self, reader: R) -> Result<Self> {
+        self.ip_db_v6 = Self::from_reader(reader)?;
         Ok(self)
     }
 
@@ -179,16 +192,16 @@ impl AsnDB {
         self.lookup(ip).and_then(code_to_str)
     }
 
-    fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+    fn read_lines<R>(reader: R) -> io::Result<io::Lines<io::BufReader<R>>>
     where
-        P: AsRef<Path>,
+        R: std::io::Read,
     {
-        let file = File::open(filename)?;
-        Ok(io::BufReader::new(file).lines())
+        Ok(io::BufReader::new(reader).lines())
     }
 
-    fn load_file<T>(file: &str) -> Result<Vec<Asn<T>>>
+    fn from_reader<T, R>(reader: R) -> Result<Vec<Asn<T>>>
     where
+        R: std::io::Read,
         T: FromStr<Err = ParseIntError>
             + From<u32>
             + PartialEq
@@ -198,7 +211,7 @@ impl AsnDB {
     {
         let mut entries = Vec::new();
 
-        let lines = Self::read_lines(file)?;
+        let lines = Self::read_lines(reader)?;
 
         let mut last_end = None;
         for line in lines {
@@ -250,7 +263,7 @@ mod test {
 
     #[test]
     fn test_load_ipv4() {
-        let db = AsnDB::load_file::<u32>("test/example.csv").unwrap();
+        let db = AsnDB::from_reader::<u32>(File::open("test/example.csv").unwrap()).unwrap();
 
         assert_eq!(db.len(), 78);
     }
