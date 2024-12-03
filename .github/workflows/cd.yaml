@@ -11,6 +11,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - uses: extractions/setup-just@v1
+
     - name: Login to Docker Hub
       run: |
         docker login \
@@ -18,7 +20,7 @@ jobs:
         -p ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Download CSVs
-      run: make download
+      run: just download
 
     - name: Build Docker image
       run: docker build -t extrawurst/ip2country:latest -f Dockerfile .
