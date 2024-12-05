@@ -2,8 +2,9 @@ name: CI
 on:
   schedule:
     - cron: '0 2 * * *'
+  pull_request:
   push:
-    branches: [ '*' ]
+    branches: [ 'master' ]
 
 jobs:
   build_and_benchmark:
