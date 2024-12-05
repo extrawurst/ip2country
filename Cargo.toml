@@ -15,8 +15,9 @@ codegen-units = 1
 unsafe_code = "forbid"
 
 [workspace.lints.clippy]
-cargo = "deny"
-pedantic = "deny"
-nursery = "deny"
+cargo = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
 # see https://github.com/rust-lang/rust-clippy/issues/12729
 # panic = "deny"
+used_underscore_items = "allow"
