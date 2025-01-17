@@ -625,7 +625,7 @@ dependencies = [
 [[package]]
 name = "iai"
 version = "0.1.1"
-source = "git+https://github.com/bheisler/iai.git?rev=58e28e940c62898a45d17cb531f9012fb173d236#58e28e940c62898a45d17cb531f9012fb173d236"
+source = "git+https://github.com/lambdaclass/iai.git?rev=3bef75b#3bef75bb13cc113a128ce9c00abfa238aceb1784"
 dependencies = [
  "cfg-if",
 ]
