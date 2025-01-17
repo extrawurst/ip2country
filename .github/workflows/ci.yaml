@@ -29,7 +29,7 @@ jobs:
     - name: benchmark-iai
       run: |
         sudo apt-get update -y && sudo apt-get install -y valgrind
-        cd ip2country-bench && just bench-inside-docker
+        cd ip2country-bench && make bench-inside-docker
 
     - name: benchmark
       run: cargo bench
