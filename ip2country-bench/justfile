@@ -2,5 +2,8 @@ build-docker:
 	docker build -t iai -f Dockerfile .
 
 bench:
-	docker run -it -v "$(sh -c pwd)/..":/project iai \
-		/bin/bash -c "cd /project/ip2country-bench && make bench-inside-docker"
+	docker run -it -v "$(pwd)/..":/project iai \
+		/bin/bash -c "cd /project/ip2country-bench && IAI_ALLOW_ASLR=true cargo bench"
+
+bench-inside-docker:
+	RUST_BACKTRACE=full IAI_ALLOW_ASLR=true cargo bench
