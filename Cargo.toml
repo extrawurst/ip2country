@@ -21,3 +21,4 @@ nursery = { level = "deny", priority = -1 }
 # see https://github.com/rust-lang/rust-clippy/issues/12729
 # panic = "deny"
 used_underscore_items = "allow"
+doc_markdown = "allow"
