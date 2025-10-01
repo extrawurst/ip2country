@@ -89,14 +89,14 @@ impl AsnDB {
     ///
     /// # Errors
     ///
-    /// Will return `Err` if `file` does not exist or the user does not have
+    /// Will return [`Err`] if `file` does not exist or the user does not have
     /// permission to read it, or when the content was not in the correct format
     pub fn load_ipv4(mut self, file: &str) -> Result<Self> {
         self.ip_db_v4 = Self::from_reader(File::open(file)?)?;
         Ok(self)
     }
 
-    /// loads csv file of format: ip-range-start (v4),ip-range-end,short-country-code
+    /// reads csv text of format: ip-range-start (v4),ip-range-end,short-country-code
     /// from a reader
     ///
     /// # Errors
@@ -111,14 +111,14 @@ impl AsnDB {
     ///
     /// # Errors
     ///
-    /// Will return `Err` if `file` does not exist or the user does not have
+    /// Will return [`Err`] if `file` does not exist or the user does not have
     /// permission to read it, or when the content was not in the correct format
     pub fn load_ipv6(mut self, file: &str) -> Result<Self> {
         self.ip_db_v6 = Self::from_reader(File::open(file)?)?;
         Ok(self)
     }
 
-    /// loads csv file of format: ip-range-start (v6),ip-range-end,short-country-code
+    /// reads csv text of format: ip-range-start (v6),ip-range-end,short-country-code
     /// from a reader
     ///
     /// # Errors
